@@ -1,0 +1,30 @@
+parameters:
+- name: workingDirectory
+  type: string
+- name: terraform_service_connection
+  type: string
+- name: bucketName
+  type: string
+- name: backend_key
+  type: string
+
+steps:
+- task: TerraformTaskV3@3
+  inputs:
+    provider: 'aws'
+    command: 'init'
+    # commandOptions: 'asfd'
+    workingDirectory: ${{ parameters.workingDirectory }}
+    backendServiceAWS: ${{ parameters.terraform_service_connection }}
+    backendAWSBucketName: ${{ parameters.bucketName }}
+    backendAWSKey: ${{ parameters.backend_key }}
+
+- task: TerraformTaskV3@3
+  inputs:
+    provider: 'aws'
+    command: 'validate'
+    # commandOptions: 'asfd'
+    workingDirectory: ${{ parameters.workingDirectory }}
+    backendServiceAWS: ${{ parameters.terraform_service_connection }}
+    backendAWSBucketName: ${{ parameters.bucketName }}
+    backendAWSKey: ${{ parameters.backend_key }}

@@ -1,0 +1,45 @@
+trigger: none
+variables:
+- group : terraform_root_org
+- name: terraform_version
+  value: "1.2.9"
+- name: terrarom_child_role_name
+  value: "terraform_child_account"
+- name: terraform_root_service_connection_name
+  value: "some value"
+- name: backend_s3_bucket
+  value: "backend bucket"
+
+parameters:
+- name: aws_account_id
+  displayName: Aws Account Number
+
+- name: vault_name
+  displayName: Vault Name
+  
+- name: kms_arn
+  displayName: Vault KMS ARN
+
+stages:
+- stage: Terraform_Deploy
+  displayName: Terraform Deploy
+  variables:
+    ACCOUNT_ID: ${{ parameters.aws_account_id }}
+    ROLE_NAME : "terraform_role"
+    VAULT_NAME: ${{ parameters.vault_name }}
+    KMS_ARN: ${{ parameters.kms_arn }}
+  jobs:
+  - job: Terraform init
+    displayName: Terraform Initialization
+    steps:
+    - tempaltes: ./steps/terraform-install.yaml
+      parameters:
+      - terraform_version: $(terraform_version)
+    - templates: ./steps/replace_tokens.yaml
+    - templates: ./steps/terraform-init.yaml
+      parameters:
+      - workingDirectory: ./terraform/
+      - terraform_service_connection: $(terraform_root_service_connection_name)
+      - bucketName: $(backend_s3_bucket)
+      - backend_key: "tf/backup-${{ parameters.vault_name }}/terraform.tfstate"
+

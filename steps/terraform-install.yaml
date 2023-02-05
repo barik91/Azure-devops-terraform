@@ -1,0 +1,10 @@
+parameters:
+- name: terraform_version
+  type: string
+  default: latest
+
+
+steps:
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+  inputs:
+    terraformVersion: ${{ parameters.terraform_version }}
